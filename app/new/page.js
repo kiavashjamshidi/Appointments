@@ -1,13 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+
 
 export default function NewAppointmentPage() {
     const router = useRouter();
 
     const [step, setStep] = useState(1);
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        if (step === 2) {
+            fetchCategories();
+        }
+    }, [step]);
+
+    async function fetchCategories() {
+        const { data, error } = await supabase.from('categories').select('*');
+        if (!error) setCategories(data);
+    }
 
     const [patientForm, setPatientForm] = useState({
         firstname: '',
@@ -25,6 +38,7 @@ export default function NewAppointmentPage() {
         start: '',
         end: '',
         notes: '',
+        category: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -47,15 +61,13 @@ export default function NewAppointmentPage() {
         e.preventDefault();
         setLoading(true);
 
-        const { firstname, lastname, birth_date } = patientForm;
+        const { email } = patientForm;
 
         // Check if patient already exists
         const { data: existing, error } = await supabase
             .from('patients')
             .select('*')
-            .eq('firstname', firstname)
-            .eq('lastname', lastname)
-            .eq('birth_date', birth_date)
+            .eq('email', email)
             .single();
 
         if (error && error.code !== 'PGRST116') {
@@ -70,7 +82,6 @@ export default function NewAppointmentPage() {
             setStep(2);
             setLoading(false);
         } else {
-            // Create new patient
             const { data, error: insertError } = await supabase
                 .from('patients')
                 .insert([patientForm])
@@ -93,18 +104,18 @@ export default function NewAppointmentPage() {
     async function handleAppointmentSubmit(e) {
         e.preventDefault();
         setLoading(true);
-
-        const { error } = await supabase.from('appointments').insert([
+        const { error: insertError } = await supabase.from('appointments').insert([
             {
                 ...appointmentForm,
                 start: new Date(appointmentForm.start),
                 end: new Date(appointmentForm.end),
                 patient: patientId,
+                category: appointmentForm.category,
             },
         ]);
 
         setLoading(false);
-        if (error) {
+        if (insertError) {
             alert('Error creating appointment');
             console.error(error);
         } else {
@@ -182,6 +193,7 @@ export default function NewAppointmentPage() {
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                                     placeholder="Care Level"
+                                    required
                                 />
                             </div>
 
@@ -217,6 +229,7 @@ export default function NewAppointmentPage() {
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                                     placeholder="Email Address"
+                                    required
                                 />
                             </div>
 
@@ -230,6 +243,7 @@ export default function NewAppointmentPage() {
                                     value={patientForm.active_since}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                                    required
                                 />
                             </div>
                         </div>
@@ -241,15 +255,18 @@ export default function NewAppointmentPage() {
                                     name="active"
                                     checked={patientForm.active}
                                     onChange={handlePatientChange}
-                                    className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-slate-800 checked:border-slate-800"
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 transition-all
+                                        checked:bg-white checked:border-slate-800 relative
+                                        after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center
+                                        after:text-slate-800 after:opacity-0 checked:after:opacity-100"
                                     id="active-check"
                                 />
-
                             </label>
                             <label className="cursor-pointer ml-2 text-slate-600 text-sm" htmlFor="active-check">
                                 Patient is Active
                             </label>
                         </div>
+
 
                         <button
                             className="mt-4 w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -261,6 +278,21 @@ export default function NewAppointmentPage() {
                     </form>
                 ) : (
                     <form onSubmit={handleAppointmentSubmit} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
+                        <select
+                            name="category"
+                            value={appointmentForm.category}
+                            onChange={handleAppointmentChange}
+                            className="w-full border p-2 rounded"
+                            required
+                        >
+                            <option value="">-- Select Category --</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.label} — {cat.description}
+                                </option>
+                            ))}
+                        </select>
+
                         <div className="mb-1 flex flex-col gap-6">
                             <div className="w-full max-w-sm min-w-[200px]">
                                 <label className="block mb-2 text-sm text-slate-600">
