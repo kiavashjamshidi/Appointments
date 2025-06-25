@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
-
 export default function NewAppointmentPage() {
     const router = useRouter();
 
@@ -40,7 +39,7 @@ export default function NewAppointmentPage() {
         notes: '',
         category: '',
         location: '',
-        attachements: '', // store as a comma-separated string for now
+        attachements: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -65,7 +64,6 @@ export default function NewAppointmentPage() {
 
         const { email } = patientForm;
 
-        // Check if patient already exists
         const { data: existing, error } = await supabase
             .from('patients')
             .select('*')
@@ -73,7 +71,7 @@ export default function NewAppointmentPage() {
             .single();
 
         if (error && error.code !== 'PGRST116') {
-            alert('Error checking patient');
+            alert('Fehler bei der Patientenüberprüfung');
             console.error(error);
             setLoading(false);
             return;
@@ -91,7 +89,7 @@ export default function NewAppointmentPage() {
                 .single();
 
             if (insertError) {
-                alert('Error creating patient');
+                alert('Fehler beim Erstellen des Patienten');
                 console.error(insertError);
                 setLoading(false);
                 return;
@@ -106,6 +104,7 @@ export default function NewAppointmentPage() {
     async function handleAppointmentSubmit(e) {
         e.preventDefault();
         setLoading(true);
+
         const { error: insertError } = await supabase.from('appointments').insert([
             {
                 ...appointmentForm,
@@ -122,9 +121,8 @@ export default function NewAppointmentPage() {
         setLoading(false);
         console.log(insertError);
 
-
         if (insertError) {
-            alert('Error creating appointment');
+            alert('Fehler beim Erstellen des Termins');
             console.error(insertError);
         } else {
             router.push('/calendar');
@@ -135,51 +133,45 @@ export default function NewAppointmentPage() {
         <div className="max-w-xl mx-auto mt-8 p-8">
             <div className="relative flex flex-col rounded-xl bg-transparent">
                 <h4 className="block text-xl font-medium text-slate-800">
-                    {step === 1 ? 'Patient Information' : 'Appointment Details'}
+                    {step === 1 ? 'Patienteninformationen' : 'Termindetails'}
                 </h4>
                 <p className="text-slate-500 font-light">
                     {step === 1
-                        ? 'Enter patient details to create or find existing patient.'
-                        : 'Schedule your appointment with the selected patient.'}
+                        ? 'Geben Sie die Patientendaten ein, um einen bestehenden Patienten zu finden oder einen neuen zu erstellen.'
+                        : 'Planen Sie Ihren Termin mit dem ausgewählten Patienten.'}
                 </p>
 
                 {step === 1 ? (
                     <form onSubmit={handlePatientSubmit} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
                         <div className="mb-1 flex flex-col gap-6">
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    First Name
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Vorname</label>
                                 <input
                                     type="text"
                                     name="firstname"
                                     value={patientForm.firstname}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="First Name"
+                                    placeholder="Vorname"
                                     required
                                 />
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Last Name
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Nachname</label>
                                 <input
                                     type="text"
                                     name="lastname"
                                     value={patientForm.lastname}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="Last Name"
+                                    placeholder="Nachname"
                                     required
                                 />
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Birth Date
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Geburtsdatum</label>
                                 <input
                                     type="date"
                                     name="birth_date"
@@ -191,136 +183,102 @@ export default function NewAppointmentPage() {
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Care Level
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Pflegegrad</label>
                                 <input
                                     type="number"
                                     name="care_level"
                                     value={patientForm.care_level}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="Care Level"
+                                    placeholder="Pflegegrad"
                                     required
                                 />
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Pronoun
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Anrede</label>
                                 <select
                                     name="pronoun"
                                     value={patientForm.pronoun}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                                 >
-                                    <option value="">Select pronoun</option>
-                                    <option value="he/him">He/Him</option>
-                                    <option value="she/her">She/Her</option>
-                                    <option value="they/them">They/Them</option>
+                                    <option value="">Anrede auswählen</option>
+                                    <option value="he/him">Er/Ihn</option>
+                                    <option value="she/her">Sie/Ihr</option>
+                                    <option value="they/them">Sie (plural)</option>
                                     <option value="ze/zir">Ze/Zir</option>
                                     <option value="xe/xem">Xe/Xem</option>
-                                    <option value="other">Other</option>
-                                    <option value="prefer-not-to-say">Prefer not to say</option>
+                                    <option value="other">Andere</option>
+                                    <option value="prefer-not-to-say">Möchte ich nicht sagen</option>
                                 </select>
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Email
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">E-Mail</label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={patientForm.email}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="Email Address"
+                                    placeholder="E-Mail Adresse"
                                     required
                                 />
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Active Since
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Aktiv Seit</label>
                                 <input
                                     type="date"
                                     name="active_since"
                                     value={patientForm.active_since}
                                     onChange={handlePatientChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    required
                                 />
                             </div>
-                        </div>
 
-                        <div className="inline-flex items-center mt-2">
-                            <label className="flex items-center cursor-pointer relative" htmlFor="active-check">
+                            <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
+                                    id="active"
                                     name="active"
                                     checked={patientForm.active}
                                     onChange={handlePatientChange}
-                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 transition-all
-                                        checked:bg-white checked:border-slate-800 relative
-                                        after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center
-                                        after:text-slate-800 after:opacity-0 checked:after:opacity-100"
-                                    id="active-check"
+                                    className="w-5 h-5 accent-slate-800 rounded border border-slate-300"
                                 />
-                            </label>
-                            <label className="cursor-pointer ml-2 text-slate-600 text-sm" htmlFor="active-check">
-                                Patient is Active
-                            </label>
+                                <label htmlFor="active" className="text-sm text-slate-600">
+                                    Aktiv
+                                </label>
+                            </div>
                         </div>
 
-
                         <button
-                            className="mt-4 w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                             type="submit"
                             disabled={loading}
+                            className="mt-4 w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                         >
-                            {loading ? 'Checking Patient...' : 'Next: Appointment Details'}
+                            {loading ? 'Wird geprüft...' : 'Weiter'}
                         </button>
                     </form>
                 ) : (
                     <form onSubmit={handleAppointmentSubmit} className="mt-8 mb-2 w-80 max-w-screen-lg sm:w-96">
-                        <select
-                            name="category"
-                            value={appointmentForm.category}
-                            onChange={handleAppointmentChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        >
-                            <option value="">-- Select Category --</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.label} — {cat.description}
-                                </option>
-                            ))}
-                        </select>
-
                         <div className="mb-1 flex flex-col gap-6">
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Appointment Title
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Titel</label>
                                 <input
                                     type="text"
                                     name="title"
                                     value={appointmentForm.title}
                                     onChange={handleAppointmentChange}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="Appointment Title"
+                                    placeholder="Termin Titel"
                                     required
                                 />
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Start Date & Time
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Startzeit</label>
                                 <input
                                     type="datetime-local"
                                     name="start"
@@ -332,9 +290,7 @@ export default function NewAppointmentPage() {
                             </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    End Date & Time
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Endzeit</label>
                                 <input
                                     type="datetime-local"
                                     name="end"
@@ -345,53 +301,69 @@ export default function NewAppointmentPage() {
                                 />
                             </div>
 
-                            <input
-                                name="location"
-                                placeholder="Location"
-                                value={appointmentForm.location}
-                                onChange={handleAppointmentChange}
-                                className="w-full border p-2 rounded"
-                                required
-                            />
-
-                            <input
-                                name="attachements"
-                                placeholder="attachements (comma-separated)"
-                                value={appointmentForm.attachements}
-                                onChange={handleAppointmentChange}
-                                className="w-full border p-2 rounded"
-                                required
-                            />
+                            <div className="w-full max-w-sm min-w-[200px]">
+                                <label className="block mb-2 text-sm text-slate-600">Kategorie</label>
+                                <select
+                                    name="category"
+                                    value={appointmentForm.category}
+                                    onChange={handleAppointmentChange}
+                                    className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                                    required
+                                >
+                                    <option value="">Kategorie auswählen</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.label} — {cat.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
                             <div className="w-full max-w-sm min-w-[200px]">
-                                <label className="block mb-2 text-sm text-slate-600">
-                                    Notes
-                                </label>
+                                <label className="block mb-2 text-sm text-slate-600">Ort</label>
+                                <input
+                                    type="text"
+                                    name="location"
+                                    value={appointmentForm.location}
+                                    onChange={handleAppointmentChange}
+                                    className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                                    placeholder="Ort des Termins"
+                                />
+                            </div>
+
+                            <div className="w-full max-w-sm min-w-[200px]">
+                                <label className="block mb-2 text-sm text-slate-600">Notizen</label>
                                 <textarea
                                     name="notes"
                                     value={appointmentForm.notes}
                                     onChange={handleAppointmentChange}
-                                    rows={3}
                                     className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                                    placeholder="Additional notes..."
+                                    placeholder="Notizen"
+                                    rows={3}
+                                />
+                            </div>
+
+                            <div className="w-full max-w-sm min-w-[200px]">
+                                <label className="block mb-2 text-sm text-slate-600">
+                                    Anhänge (durch Komma trennen)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="attachements"
+                                    value={appointmentForm.attachements}
+                                    onChange={handleAppointmentChange}
+                                    className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                                    placeholder="Dateipfade oder URLs"
                                 />
                             </div>
                         </div>
 
                         <button
-                            className="mt-4 w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                             type="submit"
                             disabled={loading}
+                            className="mt-4 w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                         >
-                            {loading ? 'Creating Appointment...' : 'Create Appointment'}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => setStep(1)}
-                            className="mt-2 w-full rounded-md bg-transparent py-2 px-4 border border-slate-300 text-center text-sm text-slate-700 transition-all shadow-sm hover:shadow-md focus:bg-slate-50 focus:shadow-none active:bg-slate-50 hover:bg-slate-50 active:shadow-none"
-                        >
-                            Back to Patient Info
+                            {loading ? 'Termin wird erstellt...' : 'Termin erstellen'}
                         </button>
                     </form>
                 )}

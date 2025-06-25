@@ -75,19 +75,19 @@ export default function FilterBar({ appointments, onFilter }) {
       {/* Sidebar */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-30 z-40 flex justify-end">
-          <div className="w-80 bg-white p-6 h-full shadow-lg overflow-auto">
-            <h2 className="text-xl font-bold mb-4">Filter Appointments</h2>
+          <div className="w-80 bg-white p-6 h-full shadow-lg overflow-auto relative">
+            <h2 className="text-xl font-bold mb-4">Termine filtern</h2>
 
-            {/* Category */}
+            {/* Kategorie */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-1">Category</label>
+              <label className="block text-sm font-semibold mb-1">Kategorie</label>
               <select
                 name="category"
                 onChange={handleChange}
                 value={filters.category}
                 className="w-full border p-2 rounded"
               >
-                <option value="">All</option>
+                <option value="">Alle</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.label}
@@ -105,7 +105,7 @@ export default function FilterBar({ appointments, onFilter }) {
                 value={filters.patient}
                 className="w-full border p-2 rounded"
               >
-                <option value="">All</option>
+                <option value="">Alle</option>
                 {patients.map((pat) => (
                   <option key={pat.id} value={pat.id}>
                     {pat.firstname} {pat.lastname}
@@ -114,9 +114,9 @@ export default function FilterBar({ appointments, onFilter }) {
               </select>
             </div>
 
-            {/* From */}
+            {/* Von Datum */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-1">From Date</label>
+              <label className="block text-sm font-semibold mb-1">Von Datum</label>
               <input
                 type="date"
                 name="from"
@@ -126,9 +126,9 @@ export default function FilterBar({ appointments, onFilter }) {
               />
             </div>
 
-            {/* To */}
+            {/* Bis Datum */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold mb-1">To Date</label>
+              <label className="block text-sm font-semibold mb-1">Bis Datum</label>
               <input
                 type="date"
                 name="to"
@@ -143,19 +143,20 @@ export default function FilterBar({ appointments, onFilter }) {
                 onClick={resetFilters}
                 className="bg-gray-300 text-black px-4 py-2 rounded"
               >
-                Reset
+                Zurücksetzen
               </button>
               <button
                 onClick={applyFilters}
                 className="bg-green-600 text-white px-4 py-2 rounded"
               >
-                Apply
+                Anwenden
               </button>
             </div>
 
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-4 right-4 text-xl font-bold"
+              aria-label="Filter schließen"
             >
               ✕
             </button>

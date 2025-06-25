@@ -82,7 +82,7 @@ export default function CalendarWeek({ appointments }) {
     return (
         <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative">
-                <div className="grid grid-cols-8 border-b border-slate-200">
+                <div className="grid grid-cols-8 border-b border-slate-200 text-center">
                     <div className="p-2 bg-slate-50 border-r border-slate-200 text-xs font-medium text-slate-600">
 
                     </div>
