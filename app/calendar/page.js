@@ -10,7 +10,7 @@ import FilterBar from '../../components/FilterBar';
 export default function CalendarPage() {
     const [appointments, setAppointments] = useState([]);
     const [filteredAppointments, setFilteredAppointments] = useState([]);
-    const [view, setView] = useState('month'); // 'month', 'list', 'weekgrid'
+    const [view, setView] = useState('month'); // 'month', 'list', 'week'
 
     useEffect(() => {
         fetchAppointments();
@@ -74,33 +74,42 @@ export default function CalendarPage() {
     return (
         <div className="p-8 space-y-6 max-w-screen-lg mx-auto">
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <h1 className="text-3xl font-bold">Appointments</h1>
                 <div className="flex gap-2">
-                    {['month', 'weekgrid', 'list'].map((v) => (
+                    {['list', 'week', 'month'].map((v) => (
                         <button
                             key={v}
                             onClick={() => setView(v)}
                             className={`px-4 py-1 rounded border text-sm ${view === v ? 'bg-blue-600 text-white' : 'bg-gray-100'
                                 }`}
                         >
-                            {v === 'month' ? 'Month' : v === 'list' ? 'List' : 'Week'}
+                            {v === 'month' ? 'Monat' : v === 'list' ? 'List' : 'Woche'}
                         </button>
                     ))}
                 </div>
             </div>
 
-            <FilterBar
-                appointments={appointments}
-                onFilter={(filtered) => setFilteredAppointments(filtered)}
-            />
+            <div className="flex justify-end items-center gap-4 mb-4">
+                <FilterBar
+                    appointments={appointments}
+                    onFilter={setFilteredAppointments}
+                />
+                <a
+                    href="/new"
+                    className="bg-black text-white px-4 py-2 rounded shadow hover:bg-gray-800"
+                >
+                    <span className="text-white text-xl">+  </span>
+                    Neuer Termin
+                </a>
+            </div>
+
 
             <div className="overflow-auto">
-                {view === 'month' ? (
-                    <CalendarMonth appointments={filteredAppointments} />
-                ) : view === 'weekgrid' ? (
+                {view === 'list' ? (
+                    <CalendarList appointments={filteredAppointments} />
+                ) : view === 'week' ? (
                     <CalendarWeekGrid appointments={filteredAppointments} />
                 ) : (
-                    <CalendarList appointments={filteredAppointments} />
+                    <CalendarMonth appointments={filteredAppointments} />
                 )}
             </div>
         </div>

@@ -39,6 +39,8 @@ export default function NewAppointmentPage() {
         end: '',
         notes: '',
         category: '',
+        location: '',
+        attachements: '', // store as a comma-separated string for now
     });
 
     const [loading, setLoading] = useState(false);
@@ -111,13 +113,19 @@ export default function NewAppointmentPage() {
                 end: new Date(appointmentForm.end),
                 patient: patientId,
                 category: appointmentForm.category,
+                attachements: appointmentForm.attachements
+                    ? appointmentForm.attachements.split(',').map((a) => a.trim())
+                    : [],
             },
         ]);
 
         setLoading(false);
+        console.log(insertError);
+
+
         if (insertError) {
             alert('Error creating appointment');
-            console.error(error);
+            console.error(insertError);
         } else {
             router.push('/calendar');
         }
@@ -336,6 +344,24 @@ export default function NewAppointmentPage() {
                                     required
                                 />
                             </div>
+
+                            <input
+                                name="location"
+                                placeholder="Location"
+                                value={appointmentForm.location}
+                                onChange={handleAppointmentChange}
+                                className="w-full border p-2 rounded"
+                                required
+                            />
+
+                            <input
+                                name="attachements"
+                                placeholder="attachements (comma-separated)"
+                                value={appointmentForm.attachements}
+                                onChange={handleAppointmentChange}
+                                className="w-full border p-2 rounded"
+                                required
+                            />
 
                             <div className="w-full max-w-sm min-w-[200px]">
                                 <label className="block mb-2 text-sm text-slate-600">

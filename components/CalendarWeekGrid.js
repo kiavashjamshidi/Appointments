@@ -1,8 +1,10 @@
 // components/CalendarWeek.js
 import { useState, useEffect } from 'react';
+import AppointmentModal from './AppointmentModal';
 
 export default function CalendarWeek({ appointments }) {
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     // Update current time every minute
     useEffect(() => {
@@ -87,29 +89,26 @@ export default function CalendarWeek({ appointments }) {
 
     return (
         <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
-            {/* Week Header */}
-            <div className="bg-slate-800 text-white p-4">
-                <h2 className="text-xl font-semibold text-center">
-                    Week of {weekDays[0].toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} - {weekDays[6].toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                </h2>
-            </div>
-
             <div className="relative">
                 {/* Time scale header */}
                 <div className="grid grid-cols-8 border-b border-slate-200">
                     <div className="p-2 bg-slate-50 border-r border-slate-200 text-xs font-medium text-slate-600">
-                        Time
+
                     </div>
                     {weekDays.map((day, index) => {
                         const isToday = day.toDateString() === today.toDateString();
                         return (
                             <div key={index} className={`p-2 text-center border-r border-slate-200 ${isToday ? 'bg-blue-50 text-blue-600 font-semibold' : 'bg-slate-50 text-slate-700'}`}>
-                                <div className="text-xs font-medium">
-                                    {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                                <div
+                                    className="text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+                                >
+                                    {day.toLocaleDateString('de-DE', {
+                                        weekday: 'long',
+                                        day: 'numeric',
+                                        month: 'long',
+                                    })}
                                 </div>
-                                <div className="text-sm">
-                                    {day.getDate()}
-                                </div>
+
                             </div>
                         );
                     })}
@@ -144,17 +143,18 @@ export default function CalendarWeek({ appointments }) {
                                             return (
                                                 <div
                                                     key={appt.id}
-                                                    className="absolute left-1 right-1 bg-blue-500 text-white text-xs rounded p-1 shadow-sm hover:bg-blue-600 cursor-pointer z-10"
-                                                    style={{ top: `${topPosition}%` }}
-                                                    title={`${appt.title} - ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                                                    onClick={() => setSelectedAppointment(appt)}
+                                                    className="p-4 border rounded bg-gray-50 hover:bg-blue-50 cursor-pointer"
                                                 >
-                                                    <div className="font-medium truncate">
+                                                    <p className="text-lg font-semibold">
                                                         {appt.title}
-                                                    </div>
-                                                    <div className="text-blue-100 text-xs">
-                                                        {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </div>
+                                                    </p>
+                                                    <p className="text-xs text-gray-600">🕘 {new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} bis {new Date(appt.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} </p>
+                                                    <p className="text-xs text-gray-600">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
+                                                    <p className="text-xs text-gray-600">📍 {appt.location}</p>
+
                                                 </div>
+
                                             );
                                         })}
                                     </div>
@@ -162,6 +162,13 @@ export default function CalendarWeek({ appointments }) {
                             })}
                         </div>
                     ))}
+
+                    {selectedAppointment && (
+                        <AppointmentModal
+                            appointment={selectedAppointment}
+                            onClose={() => setSelectedAppointment(null)}
+                        />
+                    )}
 
                     {/* Current time red line */}
                     {currentTime.getHours() >= startHour && currentTime.getHours() <= endHour && (

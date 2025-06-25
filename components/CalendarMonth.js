@@ -14,8 +14,8 @@ export default function CalendarMonth({ appointments }) {
 
     // Month names for display
     const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
     ];
 
     // Filter appointments for this month and group by date
@@ -72,7 +72,7 @@ export default function CalendarMonth({ appointments }) {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Days of week header */}
                 <div className="grid grid-cols-7 bg-slate-800 text-white">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    {['Son', 'Mon', 'Di', 'Mi', 'Do', 'Fri', 'Sa'].map((day) => (
                         <div key={day} className="p-3 text-center font-semibold text-sm">
                             {day}
                         </div>

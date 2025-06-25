@@ -1,13 +1,13 @@
-// components/FilterBar.js
 'use client';
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import NewAppointmentPage from '@/app/new/page';
 
 export default function FilterBar({ appointments, onFilter }) {
   const [categories, setCategories] = useState([]);
   const [patients, setPatients] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+
   const [filters, setFilters] = useState({
     category: '',
     patient: '',
@@ -29,141 +29,139 @@ export default function FilterBar({ appointments, onFilter }) {
     if (!patRes.error) setPatients(patRes.data);
   }
 
-  function applyFilters() {
-    let filtered = [...appointments];
-
-    if (filters.category) {
-      filtered = filtered.filter(
-        (a) => a.category === filters.category
-      );
-    }
-
-    if (filters.patient) {
-      filtered = filtered.filter(
-        (a) => a.patient === filters.patient
-      );
-    }
-
-    if (filters.from) {
-      const fromDate = new Date(filters.from);
-      filtered = filtered.filter(
-        (a) => new Date(a.start) >= fromDate
-      );
-    }
-
-    if (filters.to) {
-      const toDate = new Date(filters.to);
-      filtered = filtered.filter(
-        (a) => new Date(a.start) <= toDate
-      );
-    }
-
-    onFilter(filtered);
-  }
-
-  function resetFilters() {
-    setFilters({
-      category: '',
-      patient: '',
-      from: '',
-      to: '',
-    });
-    onFilter(appointments); // Reset to all
-  }
-
   function handleChange(e) {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   }
 
+  function applyFilters() {
+    let filtered = [...appointments];
+
+    if (filters.category)
+      filtered = filtered.filter((a) => a.category === filters.category);
+
+    if (filters.patient)
+      filtered = filtered.filter((a) => a.patient === filters.patient);
+
+    if (filters.from)
+      filtered = filtered.filter(
+        (a) => new Date(a.start) >= new Date(filters.from)
+      );
+
+    if (filters.to)
+      filtered = filtered.filter(
+        (a) => new Date(a.start) <= new Date(filters.to)
+      );
+
+    onFilter(filtered);
+    setIsOpen(false);
+  }
+
+  function resetFilters() {
+    setFilters({ category: '', patient: '', from: '', to: '' });
+    onFilter(appointments);
+    setIsOpen(false);
+  }
+
   return (
-    <div className="mb-4 flex flex-wrap gap-4 items-end border p-4 rounded">
-      {/* Category */}
-      <div>
-        <label className="block text-sm font-semibold">Category</label>
-        <select
-          name="category"
-          onChange={handleChange}
-          value={filters.category}
-          className="border p-1 rounded"
-        >
-          <option value="">All</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="px-4 py-2 rounded shadow"
+      >
+        🔍 Termine filtern
+      </button>
 
-      {/* Patient */}
-      <div>
-        <label className="block text-sm font-semibold">Patient</label>
-        <select
-          name="patient"
-          onChange={handleChange}
-          value={filters.patient}
-          className="border p-1 rounded"
-        >
-          <option value="">All</option>
-          {patients.map((pat) => (
-            <option key={pat.id} value={pat.id}>
-              {pat.firstname} {pat.lastname}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Sidebar */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 z-40 flex justify-end">
+          <div className="w-80 bg-white p-6 h-full shadow-lg overflow-auto">
+            <h2 className="text-xl font-bold mb-4">Filter Appointments</h2>
 
-      {/* Date From */}
-      <div>
-        <label className="block text-sm font-semibold">From</label>
-        <input
-          type="date"
-          name="from"
-          value={filters.from}
-          onChange={handleChange}
-          className="border p-1 rounded"
-        />
-      </div>
+            {/* Category */}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-1">Category</label>
+              <select
+                name="category"
+                onChange={handleChange}
+                value={filters.category}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">All</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Date To */}
-      <div>
-        <label className="block text-sm font-semibold">To</label>
-        <input
-          type="date"
-          name="to"
-          value={filters.to}
-          onChange={handleChange}
-          className="border p-1 rounded"
-        />
-      </div>
+            {/* Patient */}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-1">Patient</label>
+              <select
+                name="patient"
+                onChange={handleChange}
+                value={filters.patient}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">All</option>
+                {patients.map((pat) => (
+                  <option key={pat.id} value={pat.id}>
+                    {pat.firstname} {pat.lastname}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Buttons */}
-      <div className="space-x-2">
-        <button
-          onClick={applyFilters}
-          className="bg-blue-600 text-white px-3 py-1 rounded"
-        >
-          Apply
-        </button>
-        <button
-          onClick={resetFilters}
-          className="bg-gray-300 px-3 py-1 rounded"
-        >
-          Reset
-        </button>
+            {/* From */}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-1">From Date</label>
+              <input
+                type="date"
+                name="from"
+                value={filters.from}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              />
+            </div>
 
-        <a href="./new">
+            {/* To */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold mb-1">To Date</label>
+              <input
+                type="date"
+                name="to"
+                value={filters.to}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              />
+            </div>
 
-          <button
-            onClick={NewAppointmentPage}
-            className="bg-black text-white px-3 py-1 rounded"
-          >
-            New Appointment
-          </button>
-        </a>
+            <div className="flex justify-between">
+              <button
+                onClick={resetFilters}
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+              >
+                Reset
+              </button>
+              <button
+                onClick={applyFilters}
+                className="bg-green-600 text-white px-4 py-2 rounded"
+              >
+                Apply
+              </button>
+            </div>
 
-      </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-4 right-4 text-xl font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
