@@ -6,22 +6,19 @@ export default function CalendarWeek({ appointments }) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-    // Update current time every minute
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date());
-        }, 60000); // Update every minute
+        }, 60000);
 
         return () => clearInterval(timer);
     }, []);
 
-    // Get current week dates
     const today = new Date();
     const startOfWeek = new Date(today);
-    const dayOfWeek = today.getDay(); // 0 = Sunday
+    const dayOfWeek = today.getDay();
     startOfWeek.setDate(today.getDate() - dayOfWeek);
 
-    // Generate 7 days of the week
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
         const day = new Date(startOfWeek);
@@ -29,7 +26,6 @@ export default function CalendarWeek({ appointments }) {
         weekDays.push(day);
     }
 
-    // Generate hour slots (3 hours before to 4 hours after current time)
     const currentHour = currentTime.getHours();
     const startHour = Math.max(0, currentHour - 3);
     const endHour = Math.min(23, currentHour + 4);
@@ -39,7 +35,6 @@ export default function CalendarWeek({ appointments }) {
         hourSlots.push(hour);
     }
 
-    // Filter appointments for this week
     const weekStart = new Date(startOfWeek);
     weekStart.setHours(0, 0, 0, 0);
     const weekEnd = new Date(startOfWeek);
@@ -51,7 +46,6 @@ export default function CalendarWeek({ appointments }) {
         return apptDate >= weekStart && apptDate < weekEnd;
     });
 
-    // Group appointments by day and hour
     const appointmentsByDayHour = {};
     weekAppointments.forEach((appt) => {
         const apptDate = new Date(appt.start);
@@ -67,11 +61,9 @@ export default function CalendarWeek({ appointments }) {
         appointmentsByDayHour[dayKey][hour].push(appt);
     });
 
-    // Calculate current time position for the red line
     const currentMinutes = currentTime.getMinutes();
     const currentTimePosition = ((currentTime.getHours() - startHour) * 60 + currentMinutes) / ((endHour - startHour + 1) * 60) * 100;
 
-    // Format time for display
     const formatTime = (hour) => {
         return new Intl.DateTimeFormat('en-US', {
             hour: 'numeric',
@@ -90,15 +82,20 @@ export default function CalendarWeek({ appointments }) {
     return (
         <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative">
-                {/* Time scale header */}
                 <div className="grid grid-cols-8 border-b border-slate-200">
                     <div className="p-2 bg-slate-50 border-r border-slate-200 text-xs font-medium text-slate-600">
 
                     </div>
-                    {weekDays.map((day, index) => {
+                    {weekDays.map((day, dayIndex) => {
                         const isToday = day.toDateString() === today.toDateString();
+
                         return (
-                            <div key={index} className={`p-2 text-center border-r border-slate-200 ${isToday ? 'bg-blue-50 text-blue-600 font-semibold' : 'bg-slate-50 text-slate-700'}`}>
+                            <div
+                                key={dayIndex}
+                                className={`p-1 border-r border-slate-200 relative
+                                ${isToday ? 'bg-green-100' : 'bg-purple-50'}`}
+                            >
+
                                 <div
                                     className="text-[11px] font-medium whitespace-nowrap overflow-hidden text-ellipsis"
                                 >
@@ -114,18 +111,15 @@ export default function CalendarWeek({ appointments }) {
                     })}
                 </div>
 
-                {/* Calendar grid with hourly slots */}
                 <div className="relative">
                     {hourSlots.map((hour, hourIndex) => (
                         <div key={hour} className="grid grid-cols-8 border-b border-slate-100 min-h-[80px]">
-                            {/* Hour label */}
-                            <div className="p-2 bg-slate-50 border-r border-slate-200 flex items-start justify-center">
+                            <div className="p-2 bg-slate-50 border-r border-slate-200 flex items-start justify-center relative min-h-[60px]">
                                 <span className="text-xs font-medium text-slate-600">
                                     {formatTime(hour)}
                                 </span>
                             </div>
 
-                            {/* Day columns */}
                             {weekDays.map((day, dayIndex) => {
                                 const dayKey = day.toDateString();
                                 const dayAppointments = appointmentsByDayHour[dayKey]?.[hour] || [];
@@ -134,27 +128,41 @@ export default function CalendarWeek({ appointments }) {
 
                                 return (
                                     <div key={dayIndex} className={`p-1 border-r border-slate-200 relative ${isToday ? 'bg-blue-25' : ''} ${isCurrentHour ? 'bg-yellow-50' : ''}`}>
-                                        {/* Appointments for this hour */}
-                                        {dayAppointments.map((appt, apptIndex) => {
-                                            const startTime = new Date(appt.start);
-                                            const minutes = startTime.getMinutes();
-                                            const topPosition = (minutes / 60) * 100;
+                                        {dayAppointments.map((appt) => {
+                                            const start = new Date(appt.start);
+                                            const end = new Date(appt.end);
+                                            const durationMinutes = (end - start) / 60000;
+
+                                            const startMinutes = start.getMinutes();
+                                            const top = (startMinutes / 60) * 100; 
+                                            const height = (durationMinutes / 60) * 100; 
+
+                                            const isSameDay = start.toDateString() === today.toDateString();
+                                            const bgColor = isSameDay ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600';
 
                                             return (
                                                 <div
                                                     key={appt.id}
                                                     onClick={() => setSelectedAppointment(appt)}
-                                                    className="p-4 border rounded bg-gray-50 hover:bg-blue-50 cursor-pointer"
+                                                    className={`absolute left-1 right-1 text-white text-xs rounded shadow-sm cursor-pointer z-10 ${bgColor}`}
+                                                    style={{
+                                                        top: `${top}%`,
+                                                        height: `${height}%`,
+                                                    }}
+                                                    title={`${appt.title} - ${start.toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}`}
                                                 >
-                                                    <p className="text-lg font-semibold">
-                                                        {appt.title}
-                                                    </p>
-                                                    <p className="text-xs text-gray-600">🕘 {new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} bis {new Date(appt.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} </p>
-                                                    <p className="text-xs text-gray-600">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
-                                                    <p className="text-xs text-gray-600">📍 {appt.location}</p>
-
+                                                    <div className="p-1 space-y-0.5 overflow-hidden text-ellipsis text-xs leading-tight">
+                                                        <p className="font-semibold truncate">{appt.title}</p>
+                                                        <p className="text-white/80">
+                                                            🕘 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} bis {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </p>
+                                                        <p className="text-white/80 truncate">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
+                                                        <p className="text-white/80 truncate">📍 {appt.location}</p>
+                                                    </div>
                                                 </div>
-
                                             );
                                         })}
                                     </div>

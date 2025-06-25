@@ -1,5 +1,8 @@
 // components/CalendarList.js
 import React from 'react';
+import { useState } from 'react';
+
+import AppointmentModal from './AppointmentModal';
 
 export default function CalendarList({ appointments }) {
     if (!appointments || appointments.length === 0) {
@@ -18,6 +21,8 @@ export default function CalendarList({ appointments }) {
     // Sort dates
     const sortedDays = Object.keys(grouped).sort();
 
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+
     return (
         <div className="space-y-8">
             {sortedDays.map((day) => {
@@ -30,7 +35,11 @@ export default function CalendarList({ appointments }) {
                         <h2 className="text-xl font-bold border-b pb-1 mb-2">{dayLabel}</h2>
                         <ul className="space-y-4">
                             {grouped[day].map((appt) => (
-                                <li key={appt.id} className="p-4 border rounded bg-gray-50 hover:bg-blue-50">
+                                <li
+                                    key={appt.id}
+                                    className="p-4 border rounded bg-gray-50 hover:bg-blue-50 cursor-pointer"
+                                    onClick={() => setSelectedAppointment(appt)}
+                                >
                                     <p className="text-lg font-semibold">
                                         🕘 {new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
                                         - {new Date(appt.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
@@ -52,6 +61,13 @@ export default function CalendarList({ appointments }) {
                     </div>
                 );
             })}
+            {selectedAppointment && (
+                <AppointmentModal
+                    appointment={selectedAppointment}
+                    onClose={() => setSelectedAppointment(null)}
+                />
+            )}
+
         </div>
     );
 }

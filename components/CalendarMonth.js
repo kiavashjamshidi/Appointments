@@ -1,6 +1,10 @@
 // components/CalendarMonth.js
+import { useState } from 'react';
+import AppointmentModal from './AppointmentModal';
 
 export default function CalendarMonth({ appointments }) {
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+
     // Get current month/year
     const today = new Date();
     const currentMonth = today.getMonth(); // 0 = Jan
@@ -110,6 +114,7 @@ export default function CalendarMonth({ appointments }) {
                                                 {dayAppointments.slice(0, 3).map((appt, index) => (
                                                     <div
                                                         key={appt.id}
+                                                        onClick={() => setSelectedAppointment(appt)}
                                                         className="text-xs bg-blue-100 text-blue-800 rounded px-2 py-1 truncate cursor-pointer hover:bg-blue-200"
                                                         title={`${appt.title} - ${new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                                     >
@@ -138,6 +143,12 @@ export default function CalendarMonth({ appointments }) {
                             );
                         })
                     ))}
+                    {selectedAppointment && (
+                        <AppointmentModal
+                            appointment={selectedAppointment}
+                            onClose={() => setSelectedAppointment(null)}
+                        />
+                    )}
                 </div>
             </div>
 
