@@ -28,8 +28,8 @@ export default function CalendarPage() {
                 return;
             }
 
-            // Get all unique patient IDs
             const patientIds = [...new Set(appointments.map(apt => apt.patient).filter(Boolean))];
+            const categoryIds = [...new Set(appointments.map(apt => apt.category).filter(Boolean))];
 
             if (patientIds.length === 0) {
                 setAppointments(appointments);
@@ -50,6 +50,11 @@ export default function CalendarPage() {
                 return;
             }
 
+            const { data: categories, error: categoriesError } = await supabase
+                .from('categories')
+                .select('id, label') 
+                .in('id', categoryIds);
+
             // Create a lookup map for patients
             const patientMap = {};
             patients.forEach(patient => {
@@ -59,7 +64,8 @@ export default function CalendarPage() {
             // Combine the data
             const appointmentsWithPatients = appointments.map(appointment => ({
                 ...appointment,
-                patients: appointment.patient ? patientMap[appointment.patient] : null
+                patients: appointment.patient ? patientMap[appointment.patient] : null,
+                category: appointment.category ? categories.find(cat => cat.id === appointment.category) : null
             }));
 
             setAppointments(appointmentsWithPatients);

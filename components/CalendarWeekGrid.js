@@ -5,6 +5,12 @@ import AppointmentModal from './AppointmentModal';
 export default function CalendarWeek({ appointments }) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [visibleWeekStart, setVisibleWeekStart] = useState(() => {
+        const today = new Date();
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay()); // start of week (Sunday)
+        return start;
+    });
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -19,12 +25,12 @@ export default function CalendarWeek({ appointments }) {
     const dayOfWeek = today.getDay();
     startOfWeek.setDate(today.getDate() - dayOfWeek);
 
-    const weekDays = [];
-    for (let i = 0; i < 7; i++) {
-        const day = new Date(startOfWeek);
-        day.setDate(startOfWeek.getDate() + i);
-        weekDays.push(day);
-    }
+    const weekDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(visibleWeekStart);
+        d.setDate(d.getDate() + i);
+        return d;
+    });
+
 
     const currentHour = currentTime.getHours();
     const startHour = Math.max(0, currentHour - 3);
@@ -42,8 +48,8 @@ export default function CalendarWeek({ appointments }) {
     weekEnd.setHours(23, 59, 59, 999);
 
     const weekAppointments = appointments.filter((appt) => {
-        const apptDate = new Date(appt.start);
-        return apptDate >= weekStart && apptDate < weekEnd;
+        const date = new Date(appt.start);
+        return date >= visibleWeekStart && date < new Date(visibleWeekStart.getTime() + 7 * 86400000);
     });
 
     const appointmentsByDayHour = {};
@@ -134,11 +140,15 @@ export default function CalendarWeek({ appointments }) {
                                             const durationMinutes = (end - start) / 60000;
 
                                             const startMinutes = start.getMinutes();
-                                            const top = (startMinutes / 60) * 100; 
-                                            const height = (durationMinutes / 60) * 100; 
+                                            const top = (startMinutes / 60) * 100;
+                                            const height = (durationMinutes / 60) * 100;
 
                                             const isSameDay = start.toDateString() === today.toDateString();
                                             const bgColor = isSameDay ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600';
+                                            const isSameDate = (a, b) =>
+                                                a.getFullYear() === b.getFullYear() &&
+                                                a.getMonth() === b.getMonth() &&
+                                                a.getDate() === b.getDate();
 
                                             return (
                                                 <div
@@ -161,6 +171,8 @@ export default function CalendarWeek({ appointments }) {
                                                         </p>
                                                         <p className="text-white/80 truncate">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
                                                         <p className="text-white/80 truncate">📍 {appt.location}</p>
+                                                        <p className="text-white/80 truncate">🗒️ {appt.notes}</p>
+
                                                     </div>
                                                 </div>
                                             );
@@ -194,6 +206,29 @@ export default function CalendarWeek({ appointments }) {
                         </div>
                     )}
                 </div>
+                <div className="flex justify-center mt-4">
+                    <button
+                        onClick={() => setVisibleWeekStart(new Date())}
+                        className="ml-2 bg-gray-300 text-black px-4 py-2 rounded"
+                    >
+                        Diese Woche
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setVisibleWeekStart((prev) => {
+                                const next = new Date(prev);
+                                next.setDate(prev.getDate() + 7);
+                                return next;
+                            })
+                        }
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
+                        Nächste Woche laden
+                    </button>
+                </div>
+
+
             </div>
 
             {/* Legend */}

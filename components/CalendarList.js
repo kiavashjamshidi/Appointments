@@ -32,7 +32,14 @@ export default function CalendarList({ appointments }) {
 
                 return (
                     <div key={day}>
-                        <h2 className="text-xl font-bold border-b pb-1 mb-2">{dayLabel}</h2>
+                        <div className="flex items-center justify-between mb-2 border-b pb-1">
+                            <h2 className="text-xl font-bold">{dayLabel}</h2>
+                            {new Date(day).toDateString() === new Date().toDateString() && (
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">
+                                    Heute
+                                </span>
+                            )}
+                        </div>
                         <ul className="space-y-4">
                             {grouped[day].map((appt) => (
                                 <li
