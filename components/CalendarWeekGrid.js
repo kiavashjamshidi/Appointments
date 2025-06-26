@@ -25,7 +25,7 @@ export default function CalendarWeek({ appointments }) {
     const dayOfWeek = today.getDay();
     startOfWeek.setDate(today.getDate() - dayOfWeek);
 
-    const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const weekDays = Array.from({ length: 5 }, (_, i) => {
         const d = new Date(visibleWeekStart);
         d.setDate(d.getDate() + i);
         return d;
@@ -34,7 +34,7 @@ export default function CalendarWeek({ appointments }) {
 
     const currentHour = currentTime.getHours();
     const startHour = Math.max(0, currentHour - 3);
-    const endHour = Math.min(23, currentHour + 4);
+    const endHour = Math.min(23, currentHour + 3);
 
     const hourSlots = [];
     for (let hour = startHour; hour <= endHour; hour++) {
@@ -88,7 +88,7 @@ export default function CalendarWeek({ appointments }) {
     return (
         <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative">
-                <div className="grid grid-cols-8 border-b border-slate-200 text-center">
+                <div className="grid grid-cols-6 border-b border-slate-200 text-center">
                     <div className="p-2 bg-slate-50 border-r border-slate-200 text-xs font-medium text-slate-600">
 
                     </div>
@@ -119,7 +119,7 @@ export default function CalendarWeek({ appointments }) {
 
                 <div className="relative">
                     {hourSlots.map((hour, hourIndex) => (
-                        <div key={hour} className="grid grid-cols-8 border-b border-slate-100 min-h-[80px]">
+                        <div key={hour} className="grid grid-cols-6 border-b border-slate-100 min-h-[80px]">
                             <div className="p-2 bg-slate-50 border-r border-slate-200 flex items-start justify-center relative min-h-[60px]">
                                 <span className="text-xs font-medium text-slate-600">
                                     {formatTime(hour)}
@@ -144,7 +144,9 @@ export default function CalendarWeek({ appointments }) {
                                             const height = (durationMinutes / 60) * 100;
 
                                             const isSameDay = start.toDateString() === today.toDateString();
-                                            const bgColor = isSameDay ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600';
+                                            const bgColor = isSameDay ?
+                                                'bg-green-200 hover:bg-green-300 border-l-4 border-green-500' :
+                                                'bg-purple-200 hover:bg-purple-300 border-l-4 border-purple-500';
                                             const isSameDate = (a, b) =>
                                                 a.getFullYear() === b.getFullYear() &&
                                                 a.getMonth() === b.getMonth() &&
@@ -154,7 +156,7 @@ export default function CalendarWeek({ appointments }) {
                                                 <div
                                                     key={appt.id}
                                                     onClick={() => setSelectedAppointment(appt)}
-                                                    className={`absolute left-1 right-1 text-white text-xs rounded shadow-sm cursor-pointer z-10 ${bgColor}`}
+                                                    className={`absolute left-1 right-1 text-black bold text-xs rounded shadow-sm cursor-pointer z-10 ${bgColor}`}
                                                     style={{
                                                         top: `${top}%`,
                                                         height: `${height}%`,
@@ -164,14 +166,14 @@ export default function CalendarWeek({ appointments }) {
                                                         minute: '2-digit',
                                                     })}`}
                                                 >
-                                                    <div className="p-1 space-y-0.5 overflow-hidden text-ellipsis text-xs leading-tight">
-                                                        <p className="font-semibold truncate">{appt.title}</p>
-                                                        <p className="text-white/80">
+                                                    <div className="p-1 space-y-0.5 overflow-hidden text-[10px] leading-none">
+                                                        <p className="font-semibold truncate" style={{ fontSize: 'clamp(9px, 2.2vw, 14px)' }}>{appt.title}</p>
+                                                        <p className="text-black/80">
                                                             🕘 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} bis {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </p>
-                                                        <p className="text-white/80 truncate">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
-                                                        <p className="text-white/80 truncate">📍 {appt.location}</p>
-                                                        <p className="text-white/80 truncate">🗒️ {appt.notes}</p>
+                                                        <p className="text-black/80 truncate">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
+                                                        <p className="text-black/80 truncate">📍 {appt.location}</p>
+                                                        <p className="text-black/80 truncate">🗒️ {appt.notes}</p>
 
                                                     </div>
                                                 </div>
