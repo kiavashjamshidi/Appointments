@@ -313,7 +313,7 @@ export default function NewAppointmentPage() {
                                     <option value="">Kategorie auswählen</option>
                                     {categories.map((cat) => (
                                         <option key={cat.id} value={cat.id}>
-                                            {cat.label} — {cat.description}
+                                            {cat.label}
                                         </option>
                                     ))}
                                 </select>

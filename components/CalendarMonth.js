@@ -1,6 +1,11 @@
 // components/CalendarMonth.js
 import { useState } from 'react';
 import AppointmentModal from './AppointmentModal';
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function CalendarMonth({ appointments }) {
     const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -108,8 +113,11 @@ export default function CalendarMonth({ appointments }) {
 
                             {weeks.map((week, weekIndex) => (
                                 week.map((day, dayIndex) => {
-                                    const dayDate = new Date(day);
-                                    const isToday = day && isSameDate(dayDate, new Date());
+                                    const fullDate = day
+                                        ? new Date(currentYear, currentMonth, day)
+                                        : null;
+
+                                    const isToday = fullDate && isSameDate(fullDate, new Date());
                                     const dayAppointments = day ? appointmentsByDay[day] || [] : [];
 
                                     return (
@@ -133,18 +141,34 @@ export default function CalendarMonth({ appointments }) {
 
                                                     {/* Appointments for this day */}
                                                     <div className="space-y-1">
-                                                        {dayAppointments.slice(0, 3).map((appt, index) => (
-                                                            <div
-                                                                key={appt.id}
-                                                                onClick={() => setSelectedAppointment(appt)}
-                                                                className="text-xs bg-blue-100 text-blue-800 rounded px-2 py-1 truncate cursor-pointer hover:bg-blue-200"
-                                                                title={`${appt.title} - ${new Date(appt.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
-                                                            >
-                                                                <div className="font-medium truncate">
-                                                                    {appt.title}
-                                                                </div>
-                                                            </div>
-                                                        ))}
+                                                        {dayAppointments.slice(0, 3).map((appt) => {
+                                                            const start = new Date(appt.start);
+                                                            const end = new Date(appt.end);
+
+                                                            return (
+                                                                <HoverCard key={appt.id}>
+                                                                    <HoverCardTrigger asChild>
+                                                                        <div
+                                                                            className="text-xs bg-blue-100 text-blue-800 rounded px-2 py-1 truncate cursor-pointer hover:bg-blue-200"
+                                                                            title={`${appt.title} - ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                                                                            onClick={() => setSelectedAppointment(appt)}
+                                                                        >
+                                                                            <div className="font-medium truncate">{appt.title}</div>
+                                                                        </div>
+                                                                    </HoverCardTrigger>
+                                                                    <HoverCardContent className="w-64 text-sm space-y-1">
+                                                                        <p className="font-semibold truncate" style={{ fontSize: 'clamp(9px, 2.2vw, 14px)' }}>{appt.title}</p>
+                                                                        <p className="text-black/80">
+                                                                            🕘 {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} – {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                        </p>
+                                                                        <p className="text-black/80 truncate">👤 {appt.patients?.firstname} {appt.patients?.lastname}</p>
+                                                                        <p className="text-black/80 truncate">📍 {appt.location}</p>
+                                                                        <p className="text-black/80 truncate">🗒️ {appt.notes}</p>
+                                                                    </HoverCardContent>
+                                                                </HoverCard>
+                                                            );
+                                                        })}
+
 
                                                         {/* Show "+" indicator if more than 3 appointments */}
                                                         {dayAppointments.length > 3 && (
@@ -204,7 +228,8 @@ export default function CalendarMonth({ appointments }) {
                         {todayAppointments.map((appt) => (
                             <li
                                 key={appt.id}
-                                className="border-l-4 border-blue-500 bg-blue-50 p-2 rounded text-sm"
+                                onClick={() => setSelectedAppointment(appt)}
+                                className="border-l-4 border-blue-500 bg-blue-50 p-2 rounded text-sm cursor-pointer hover:bg-blue-100 transition"
                             >
                                 <div className="font-bold">{appt.title}</div>
                                 <div className="text-xs text-gray-600">

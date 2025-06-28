@@ -38,10 +38,10 @@ export default function FilterBar({ appointments, onFilter }) {
     let filtered = [...appointments];
 
     if (filters.category)
-      filtered = filtered.filter((a) => a.category === filters.category);
+      filtered = filtered.filter((a) => a.category?.id === filters.category);
 
     if (filters.patient)
-      filtered = filtered.filter((a) => a.patient === filters.patient);
+      filtered = filtered.filter((a) => a.patients?.id === filters.patient);
 
     if (filters.from)
       filtered = filtered.filter(
