@@ -48,6 +48,14 @@ npm install
 npm run dev
 ```
 
+### 4. Preview the App
+
+You can access the app locally at [http://localhost:3000](http://localhost:3000) after starting the dev server.
+
+Or view the live deployed version here:
+
+[https://appointments-inky.vercel.app](https://appointments-inky.vercel.app)
+
 ---
 
 ## 📸 Screenshots
