@@ -32,7 +32,7 @@ CareCalendar is a calendar-based patient appointment management system built for
 ### 1. Clone the Project
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/carecalendar.git
+git clone https://github.com/kiavashjamshidi/Appointments.git
 cd carecalendar
 ```
 
@@ -42,24 +42,7 @@ cd carecalendar
 npm install
 ```
 
-### 3. Set Up Supabase
-
-1. Go to [supabase.com](https://supabase.com) and create a new project.
-2. Create the necessary tables:
-   - `appointments`
-   - `patients`
-   - `categories`
-3. Set up relationships (e.g., `appointment.category → categories.id`)
-4. Get your `SUPABASE_URL` and `SUPABASE_ANON_KEY`
-
-### 4. Add Your `.env.local`
-
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-```
-
-### 5. Run Dev Server
+### 3. Run Dev Server
 
 ```bash
 npm run dev
@@ -69,9 +52,38 @@ npm run dev
 
 ## 📸 Screenshots
 
-- Month View with daily sidebar
-- Week Grid with hour positioning
-- List View grouped by day
-- Modal for appointment details
-- Filter sidebar
-- HoverCard tooltips (via shadcn)
+### Month View
+
+![Month View](images/month-view.png)
+
+### Week View
+
+![Week View](images/week-view.png)
+
+### List View
+
+![List View](images/list-view.png)
+
+### Month View with Hover
+
+![Month View Hover](images/month-view-hover.png)
+
+### Filter Bar
+
+![Filter Bar](images/filterbar.png)
+
+### Appointment Edit Form
+
+![Appointment Edit Form](images/appointment-edit-form.png)
+
+### Appointment Modal
+
+![Appointment Modal](images/appointment-modal.png)
+
+### New Appointment Form
+
+![New Appointment](images/new-appointment.png)
+
+### New Appointment Page (Step 2)
+
+![New Appointment Page 2](images/new-appointment-page2.png)
