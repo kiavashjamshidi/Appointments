@@ -1,4 +1,5 @@
+import { redirect } from 'next/navigation';
+
 export default function Home() {
-    return <div>Redirecting...</div>; // Optional: redirect to /calendar
-  }
-  
+  redirect('/calendar');
+}
