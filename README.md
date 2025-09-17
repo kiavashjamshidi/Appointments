@@ -4,21 +4,21 @@ CareCalendar is a calendar-based patient appointment management system built for
 
 ---
 
-## 🚀 Features
+## Features
 
-- 📅 Month, Week, and List Views
-- 🧑‍⚕️ Link Appointments to Patients (with care level, pronouns, active status)
-- 🏷️ Appointment Categories (with color, icon, description)
-- 📍 Add Location, Notes, and Attachments
-- 🔍 Filter by Category, Patient, or Date Range
-- ✏️ Create, Edit, and Delete Appointments
-- 🪟 Modal-based Appointment View + Edit
-- 🧠 Hover Card Support (with shadcn)
-- 🗂️ Fully Powered by Supabase
+- Month, Week, and List Views
+- Link Appointments to Patients (with care level, pronouns, active status)
+- Appointment Categories (with color, icon, description)
+- Add Location, Notes, and Attachments
+- Filter by Category, Patient, or Date Range
+- Create, Edit, and Delete Appointments
+- Modal-based Appointment View + Edit
+- Hover Card Support (with shadcn)
+- Fully Powered by Supabase
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 14 (App Router) + Tailwind CSS
 - **Backend**: Supabase (PostgreSQL)
@@ -27,7 +27,7 @@ CareCalendar is a calendar-based patient appointment management system built for
 
 ---
 
-## 📦 Setup Instructions
+## Setup Instructions
 
 ### 1. Clone the Project
 
@@ -58,7 +58,7 @@ Or view the live deployed version here:
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Month View
 
